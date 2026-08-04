@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="مجموعة من الأدوات الذكية والمجانية لتسهيل مهامك اليومية، مثل تحويل الصور، ضغط الملفات، توليد كلمات المرور، وغيرها.">
+    <meta name="theme-color" content="#007bff">
+    <title>أدواتي الذكية - الصفحة الرئيسية</title>
+    
+    <!-- خط عربي مميز من جوجل (Cairo) لجمالية الموقع -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ربط ملف التصميم الخارجي -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-content">
+            <h1>🛠️ مجموعة الأدوات الذكية</h1>
+            <p>اختر الأداة التي تحتاجها وأنجز مهامك بكل سهولة وسرعة</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tools-grid">
+            <!-- أداة تحويل الصور إلى PDF -->
+            <a href="tools/image-to-pdf.html" class="tool-card" aria-label="تحويل الصور إلى ملف PDF">
+                <div class="icon">📄</div>
+                <h3>تحويل الصور إلى PDF</h3>
+                <p>اجمع عدة صور في ملف PDF واحد بكل سهولة واحترافية.</p>
+            </a>
+
+            <!-- أداة ضغط الصور -->
+            <a href="tools/compress-image.html" class="tool-card" aria-label="ضغط وتقليل حجم الصور">
+                <div class="icon">🖼️</div>
+                <h3>ضغط الصور</h3>
+                <p>قلل حجم الصور لتوفير المساحة مع الحفاظ على جودتها الأصلية.</p>
+            </a>
+
+            <!-- أداة صانع الـ QR -->
+            <a href="tools/qr-generator.html" class="tool-card" aria-label="توليد رموز QR">
+                <div class="icon">📱</div>
+                <h3>صانع باركود (QR)</h3>
+                <p>أنشئ رموز QR لأي نص، رابط، أو رقم هاتف في ثوانٍ معدودة.</p>
+            </a>
+
+            <!-- أداة مولد كلمات المرور -->
+            <a href="tools/password-generator.html" class="tool-card" aria-label="إنشاء كلمات مرور قوية">
+                <div class="icon">🔐</div>
+                <h3>توليد كلمات المرور</h3>
+                <p>أنشئ كلمات مرور قوية، آمنة، وصعبة الاختراق لحماية حساباتك.</p>
+            </a>
+
+            <!-- أداة عد الكلمات -->
+            <a href="tools/word-counter.html" class="tool-card" aria-label="حساب عدد الكلمات والحروف">
+                <div class="icon">📝</div>
+                <h3>حاسبة الكلمات</h3>
+                <p>احسب عدد الكلمات، الحروف، والأسطر في نصوصك ومقالاتك بدقة.</p>
+            </a>
+
+            <!-- أداة تحويل صيغ الصور -->
+            <a href="tools/image-converter.html" class="tool-card" aria-label="تحويل صيغ الصور">
+                <div class="icon">🔄</div>
+                <h3>محول صيغ الصور</h3>
+                <p>حول صورك بين الصيغ المختلفة مثل JPG, PNG, WEBP بسهولة تامة.</p>
+            </a>
+
+            <!-- أداة اختيار الألوان -->
+            <a href="tools/color-picker.html" class="tool-card" aria-label="اختيار الألوان واستخراج الأكواد">
+                <div class="icon">🎨</div>
+                <h3>منتقي الألوان</h3>
+                <p>اختر الألوان بدقة واحصل على أكوادها (HEX, RGB) لاستخدامها في تصاميمك.</p>
+            </a>
+
+            <!-- أداة ضغط ملفات PDF -->
+            <a href="tools/pdf-compress.html" class="tool-card" aria-label="ضغط وتقليل حجم ملفات PDF">
+                <div class="icon">🗜️</div>
+                <h3>ضغط ملفات PDF</h3>
+                <p>قلل حجم ملفات الـ PDF الكبيرة لتسهيل إرسالها ومشاركتها مع الآخرين.</p>
+            </a>
+        </section>
+    </main>
+
+    <footer class="main-footer" style="text-align: center; padding: 20px; color: #666; margin-top: 40px; font-size: 0.9rem;">
+        <p>جميع الحقوق محفوظة &copy; 2026 - موقع أدواتي الذكية</p>
+    </footer>
+
+    <!-- ربط ملف الجافاسكريبت الرئيسي (استخدام defer لزيادة سرعة الموقع) -->
+    <script src="script.js" defer></script>
+</body>
+</html>
