@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل PDF إلى Word - الأدوات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <!-- مكتبة قراءة ملفات الـ PDF المتصفح -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        .tool-container { background: var(--card-bg, #ffffff); padding: 35px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto 50px auto; text-align: center; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-light, #64748b); text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        .upload-area { border: 2px dashed #cbd5e1; padding: 30px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; display: block; }
+        input[type="file"] { display: none; }
+        .btn { background: var(--primary-color, #2563eb); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit; width: 100%; margin-top: 15px; }
+        #file-name { color: var(--primary-color); font-weight: bold; margin-top: 10px; display: block; }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>📝 تحويل ملف PDF إلى Word</h1>
+        <p>استخرج النصوص من ملفات الـ PDF وحولها إلى مستند قابل للتعديل</p>
+    </header>
+
+    <main class="container">
+        <a href="../index.html" class="back-btn">&rarr; العودة إلى القائمة الرئيسية</a>
+        <div class="tool-container">
+            <label class="upload-area">
+                <span>اختر ملف PDF 📁</span>
+                <input type="file" id="pdf-file-input" accept="application/pdf">
+            </label>
+            <span id="file-name"></span>
+            <button class="btn" id="convert-pdf-btn">بدء التحويل وتحميل Word 🚀</button>
+        </div>
+    </main>
+
+    <script src="../script.js" defer></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        
+        const pdfFileInput = document.getElementById('pdf-file-input');
+        const fileName = document.getElementById('file-name');
+        const convertBtn = document.getElementById('convert-pdf-btn');
+        let selectedFile = null;
+
+        pdfFileInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                fileName.textContent = "الملف المختار: " + selectedFile.name;
+            }
+        });
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                if (typeof showNotification === 'function') showNotification("يرجى اختيار ملف PDF أولاً ⚠️", true);
+                return;
+            }
+
+            if (typeof showNotification === 'function') showNotification("جاري استخراج النصوص وتحويل الملف... ⏳");
+
+            try {
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = "";
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(" ");
+                    fullText += `--- الصفحة ${i} ---\n\n` + pageText + "\n\n\n";
+                }
+
+                // إنشاء ملف وورد وهمي (Blob بصيغة مستند نصي يفتح ببرنامج الـ Word)
+                const blob = new Blob(['\ufeff' + fullText], { type: 'application/msword;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = selectedFile.name.replace(/\.[^/.]+$/, "") + ".doc";
+                link.click();
+
+                if (typeof showNotification === 'function') showNotification("تم التحويل وتحميل ملف الـ Word بنجاح! 🎉");
+            } catch (error) {
+                console.error(error);
+                if (typeof showNotification === 'function') showNotification("حدث خطأ أثناء قراءة ملف الـ PDF ❌", true);
+            }
+        });
+    </script>
+</body>
+</html>
