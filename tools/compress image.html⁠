@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ضغط الصور - الأدوات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .tool-container { background: var(--card-bg, #ffffff); padding: 35px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto 50px auto; text-align: center; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-light, #64748b); text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        .upload-area { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover { border-color: var(--primary-color, #2563eb); background: #f8fafc; }
+        input[type="file"] { display: none; }
+        .controls { margin-top: 20px; text-align: right; display: none; }
+        .controls label { font-weight: bold; display: block; margin-bottom: 10px; }
+        input[type="range"] { width: 100%; margin-bottom: 20px; }
+        .btn { background: var(--primary-color, #2563eb); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit; width: 100%; display: none; }
+        .btn-download { background: #10b981; margin-top: 10px; }
+        .preview-img { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>🖼️ ضغط الصور</h1>
+        <p>قلل حجم صورك بسهولة مع الحفاظ على جودتها</p>
+    </header>
+
+    <main class="container">
+        <a href="../index.html" class="back-btn">&rarr; العودة إلى القائمة الرئيسية</a>
+        <div class="tool-container">
+            <label class="upload-area">
+                <span>اضغط هنا لاختيار صورة 📁</span>
+                <input type="file" id="upload-image" accept="image/jpeg, image/png, image/webp">
+            </label>
+            
+            <img id="preview" class="preview-img">
+
+            <div class="controls" id="controls">
+                <label>مستوى الجودة: <span id="quality-val">70%</span></label>
+                <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.7">
+                <button class="btn" id="compress-btn" style="display: block;">ضغط الصورة 🗜️</button>
+                <button class="btn btn-download" id="download-btn">⬇️ تحميل الصورة المضغوطة</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../script.js" defer></script>
+    <script>
+        const uploadImage = document.getElementById('upload-image');
+        const preview = document.getElementById('preview');
+        const controls = document.getElementById('controls');
+        const qualityInput = document.getElementById('quality');
+        const qualityVal = document.getElementById('quality-val');
+        const compressBtn = document.getElementById('compress-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        let originalFile = null;
+
+        uploadImage.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            originalFile = file;
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+            controls.style.display = 'block';
+            downloadBtn.style.display = 'none';
+        });
+
+        qualityInput.addEventListener('input', (e) => {
+            qualityVal.textContent = Math.round(e.target.value * 100) + '%';
+        });
+
+        compressBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', parseFloat(qualityInput.value));
+                
+                downloadBtn.style.display = 'block';
+                downloadBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.href = compressedDataUrl;
+                    link.download = 'compressed-image.jpg';
+                    link.click();
+                    if (typeof showNotification === 'function') showNotification("تم ضغط وتحميل الصورة بنجاح! ✅");
+                };
+            };
+            img.src = preview.src;
+        });
+    </script>
+</body>
+</html>
