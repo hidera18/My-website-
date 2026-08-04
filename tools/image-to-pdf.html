@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل الصور إلى PDF - الأدوات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <style>
+        .tool-container {
+            background: var(--card-bg, #ffffff);
+            padding: 35px 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+            text-align: center;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light, #64748b);
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        input[type="file"] { margin: 20px 0; }
+        .btn {
+            background: var(--primary-color, #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>📄 تحويل الصور إلى PDF</h1>
+        <p>اختر الصور ودمجها في ملف PDF واحد بكل سهولة</p>
+    </header>
+
+    <main class="container">
+        <a href="../index.html" class="back-btn">&rarr; العودة إلى القائمة الرئيسية</a>
+
+        <div class="tool-container">
+            <input type="file" id="img-input" accept="image/*" multiple>
+            <br>
+            <button class="btn" id="convert-btn">تحميل كملف PDF 📥</button>
+        </div>
+    </main>
+
+    <script src="../script.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('convert-btn').addEventListener('click', async () => {
+                const files = document.getElementById('img-input').files;
+                if (files.length === 0) {
+                    if (typeof showNotification === 'function') showNotification("يرجى اختيار صورة واحدة على الأقل ⚠️", true);
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const imgData = await readFileAsDataURL(file);
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 15, 15, 180, 160);
+                }
+
+                pdf.save("my-images.pdf");
+                if (typeof showNotification === 'function') showNotification("تم إنشاء وتحميل ملف الـ PDF بنجاح! 🎉");
+            });
+
+            function readFileAsDataURL(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
