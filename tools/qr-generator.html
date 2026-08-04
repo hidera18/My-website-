@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صانع الباركود (QR) - الأدوات الذكية</title>
+    
+    <!-- خطوط جوجل (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ربط ملف التصميم الرئيسي (ملاحظة: نستخدم ../ للرجوع للمجلد الرئيسي) -->
+    <link rel="stylesheet" href="../style.css">
+    
+    <!-- استدعاء مكتبة توليد الـ QR العالمية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    
+    <style>
+        /* تنسيقات خاصة بهذه الأداة فقط */
+        .tool-container {
+            background: var(--card-bg, #ffffff);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+            text-align: center;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light, #64748b);
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary-color, #2563eb);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary-color, #2563eb);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: var(--primary-color, #2563eb);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background: var(--secondary-color, #1e40af);
+            transform: translateY(-2px);
+        }
+        
+        .btn-download {
+            background: #10b981; /* لون أخضر للتحميل */
+            display: none; /* مخفي لحين توليد الصورة */
+        }
+        
+        .btn-download:hover {
+            background: #059669;
+        }
+        
+        #qrcode {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 250px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+        }
+        
+        #qrcode img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الصفحة الموحد -->
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>📱 صانع باركود (QR)</h1>
+        <p>أنشئ رمز استجابة سريع لأي نص أو رابط في ثوانٍ معدودة</p>
+    </header>
+
+    <main class="container">
+        <!-- زر العودة للرئيسية -->
+        <a href="../index.html" class="back-btn">
+            <span>&rarr;</span> العودة إلى القائمة الرئيسية
+        </a>
+        
+        <!-- حاوية الأداة -->
+        <div class="tool-container">
+            <div class="input-group">
+                <input type="text" id="qr-text" placeholder="اكتب الرابط، النص، أو رقم الهاتف هنا..." autocomplete="off">
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn" id="generate-btn">توليد الـ QR</button>
+                <button class="btn btn-download" id="download-btn">⬇️ تحميل الصورة</button>
+            </div>
+            
+            <!-- مكان عرض الـ QR -->
+            <div id="qrcode">
+                <p style="color: #94a3b8; font-size: 0.95rem;">سيظهر رمز الـ QR هنا بعد التوليد</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ربط ملف الجافاسكريبت الرئيسي لاستخدام الإشعارات -->
+    <script src="../script.js" defer></script>
+    
+    <!-- الجافاسكريبت الخاص بتشغيل الأداة -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const generateBtn = document.getElementById('generate-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const qrInput = document.getElementById('qr-text');
+            const qrContainer = document.getElementById('qrcode');
+
+            // التوليد عند الضغط على الزر
+            generateBtn.addEventListener('click', generateQR);
+
+            // التوليد عند الضغط على زر Enter في لوحة المفاتيح
+            qrInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') generateQR();
+            });
+
+            function generateQR() {
+                const text = qrInput.value.trim();
+                
+                // التحقق من أن الحقل ليس فارغاً
+                if (!text) {
+                    if (typeof showNotification === 'function') {
+                        showNotification("يرجى كتابة نص أو رابط أولاً ⚠️", true);
+                    } else {
+                        alert("يرجى كتابة نص أو رابط أولاً");
+                    }
+                    return;
+                }
+
+                // مسح الـ QR القديم وتجهيز الحاوية
+                qrContainer.innerHTML = '';
+                qrContainer.style.border = 'none';
+                qrContainer.style.background = 'transparent';
+                downloadBtn.style.display = 'none';
+
+                // توليد الـ QR الجديد
+                new QRCode(qrContainer, {
+                    text: text,
+                    width: 220,
+                    height: 220,
+                    colorDark: "#0f172a", // لون غامق جداً بدلاً من الأسود الصافي لجمالية أفضل
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H // دقة عالية
+                });
+
+                // إظهار زر التحميل وإشعار النجاح بعد التوليد بجزء من الثانية
+                setTimeout(() => {
+                    downloadBtn.style.display = 'inline-block';
+                    if (typeof showNotification === 'function') {
+                        showNotification("تم توليد الـ QR بنجاح! ✅");
+                    }
+                }, 100);
+            }
+
+            // برمجة زر التحميل
+            downloadBtn.addEventListener('click', () => {
+                const img = qrContainer.querySelector('img');
+                const canvas = qrContainer.querySelector('canvas');
+                let imgUrl = '';
+                
+                if (img && img.src) {
+                    imgUrl = img.src;
+                } else if (canvas) {
+                    imgUrl = canvas.toDataURL("image/png");
+                }
+
+                if (imgUrl) {
+                    const link = document.createElement('a');
+                    link.href = imgUrl;
+                    link.download = 'My-QR-Code.png'; // اسم الملف عند التحميل
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    if (typeof showNotification === 'function') {
+                        showNotification("تم تحميل الصورة بنجاح! 🎉");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
