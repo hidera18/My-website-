@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ضغط ملفات PDF - الأدوات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" defer></script>
+    <style>
+        .tool-container { background: var(--card-bg, #ffffff); padding: 40px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto 50px auto; text-align: center; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-light, #64748b); text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        .upload-area { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s; display: block;}
+        .upload-area:hover { border-color: var(--primary-color, #2563eb); background: #f8fafc; }
+        input[type="file"] { display: none; }
+        .btn { background: var(--primary-color, #2563eb); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit; width: 100%; }
+        #file-name { color: var(--primary-color); font-weight: bold; margin-top: 10px; display: block; }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>🗜️ ضغط ملفات PDF</h1>
+        <p>إعادة معالجة وحفظ ملفات الـ PDF لتخفيف حجمها الممكن</p>
+    </header>
+
+    <main class="container">
+        <a href="../index.html" class="back-btn">&rarr; العودة إلى القائمة الرئيسية</a>
+        <div class="tool-container">
+            <label class="upload-area">
+                <span>اضغط هنا لاختيار ملف PDF 📁</span>
+                <input type="file" id="pdf-upload" accept="application/pdf">
+            </label>
+            <span id="file-name"></span>
+            <br><br>
+            <button class="btn" id="compress-pdf-btn">معالجة وتحميل الملف 🚀</button>
+        </div>
+    </main>
+
+    <script src="../script.js" defer></script>
+    <script>
+        const pdfUpload = document.getElementById('pdf-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        
+        pdfUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = "الملف المحدد: " + e.target.files[0].name;
+            }
+        });
+
+        document.getElementById('compress-pdf-btn').addEventListener('click', async () => {
+            if (pdfUpload.files.length === 0) {
+                if (typeof showNotification === 'function') showNotification("يرجى اختيار ملف PDF أولاً ⚠️", true);
+                return;
+            }
+
+            const file = pdfUpload.files[0];
+            const arrayBuffer = await file.arrayBuffer();
+            
+            try {
+                const { PDFDocument } = window.PDFLib;
+                // تحميل الملف وإعادة حفظه للتخلص من البيانات غير المستخدمة
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                const pdfBytes = await pdfDoc.save();
+                
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'compressed-' + file.name;
+                link.click();
+                
+                if (typeof showNotification === 'function') showNotification("تمت معالجة وتحميل الملف بنجاح! ✅");
+            } catch (error) {
+                if (typeof showNotification === 'function') showNotification("حدث خطأ أثناء معالجة الملف ❌", true);
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
