@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تغيير خلفية الصورة إلى بيضاء - الأدوات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .tool-container { background: var(--card-bg, #ffffff); padding: 35px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto 50px auto; text-align: center; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-light, #64748b); text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        .upload-area { border: 2px dashed #cbd5e1; padding: 30px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; display: block; }
+        input[type="file"] { display: none; }
+        .btn { background: var(--primary-color, #2563eb); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit; width: 100%; display: none; margin-top: 15px; }
+        .btn-download { background: #10b981; }
+        #preview { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="padding: 30px 20px; margin-bottom: 30px; border-radius: 0 0 25px 25px;">
+        <h1>⬜ جعل خلفية الصورة بيضاء</h1>
+        <p>قم بتعديل وتوحيد خلفية صورتك لتصبح بيضاء بضغطة زر</p>
+    </header>
+
+    <main class="container">
+        <a href="../index.html" class="back-btn">&rarr; العودة إلى القائمة الرئيسية</a>
+        <div class="tool-container">
+            <label class="upload-area">
+                <span>اختر صورة شخصية أو عامة 📁</span>
+                <input type="file" id="image-input" accept="image/*">
+            </label>
+            <img id="preview">
+            <button class="btn" id="process-btn">جعل الخلفية بيضاء 🪄</button>
+            <button class="btn btn-download" id="download-btn">تحميل الصورة النهائية 📥</button>
+        </div>
+    </main>
+
+    <script src="../script.js" defer></script>
+    <script>
+        const imageInput = document.getElementById('image-input');
+        const preview = document.getElementById('preview');
+        const processBtn = document.getElementById('process-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        let imageSrc = "";
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                imageSrc = event.target.result;
+                preview.src = imageSrc;
+                preview.style.display = 'block';
+                processBtn.style.display = 'block';
+                downloadBtn.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        processBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // تعبئة الخلفية باللون الأبيض أولاً
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // رسم الصورة فوق الخلفية البيضاء
+                ctx.drawImage(img, 0, 0);
+                
+                preview.src = canvas.toDataURL('image/jpeg', 0.9);
+                downloadBtn.style.display = 'block';
+                
+                downloadBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.href = preview.src;
+                    link.download = 'white-bg-image.jpg';
+                    link.click();
+                    if (typeof showNotification === 'function') showNotification("تم تعديل وتحميل الصورة بنجاح! ✅");
+                };
+            };
+            img.src = imageSrc;
+        });
+    </script>
+</body>
+</html>
